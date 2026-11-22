@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Review queue{% endblock %}
+{% block content %}
+<h1>Review queue</h1>
+<p class="muted">{{ pending }} pending of {{ packages|length }} packages.</p>
+<div class="panel">
+{% if packages %}
+<table>
+  <thead><tr><th>Package</th><th>Form</th><th>Client</th><th>Prepared by</th><th>Fields</th><th>Status</th></tr></thead>
+  <tbody>
+  {% for p in packages %}
+    <tr>
+      <td><a href="/packages/{{ p.id }}"><code>{{ p.id }}</code></a></td>
+      <td>{{ p.data.template_title }}<br><span class="muted">{{ p.data.provider }}, v{{ p.data.template_version }}</span></td>
+      <td><code>{{ p.data.client_id }}</code></td>
+      <td>{{ p.data.prepared_by }}</td>
+      <td>
+        {% for name, n in p.report.summary.items() if n %}
+          <span class="badge s-{{ name }}">{{ n }} {{ name }}</span>
+        {% endfor %}
+      </td>
+      <td><span class="badge s-{{ p.status }}">{{ p.status }}</span>
+        {% if p.report.blocking and p.status == "pending" %}<br><span class="muted">blocked</span>{% endif %}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">No packages yet. Create one with <code>formfill fill --template ... --client ...</code>.</p>
+{% endif %}
+</div>
+{% endblock %}

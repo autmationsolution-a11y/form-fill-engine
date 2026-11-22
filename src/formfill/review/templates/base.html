@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Form review{% endblock %}</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --panel: #ffffff; --text: #1c2430; --muted: #5d6b7c; --line: #dfe3e8;
+    --accent: #1f3a5f; --ok: #1e7a46; --warn: #9a6700; --bad: #b42318; --skip: #6b7280;
+    --ok-bg: #e7f5ec; --warn-bg: #fff6dc; --bad-bg: #fdecea; --skip-bg: #f0f1f3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12161c; --panel: #1a2029; --text: #e6e9ee; --muted: #9aa6b4; --line: #2c3440;
+      --accent: #8fb3e0; --ok: #5cc98a; --warn: #e6b450; --bad: #f2837a; --skip: #9aa1ab;
+      --ok-bg: #16301f; --warn-bg: #33290f; --bad-bg: #3a1a18; --skip-bg: #232830;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { background: var(--panel); border-bottom: 1px solid var(--line); padding: 14px 24px;
+           display: flex; align-items: baseline; gap: 16px; }
+  header a { color: var(--accent); text-decoration: none; font-weight: 600; }
+  main { padding: 20px 24px; max-width: 1500px; margin: 0 auto; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .muted { color: var(--muted); }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 7px 9px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  code { font: 12px ui-monospace, SFMono-Regular, Consolas, monospace; }
+  .badge { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; font-weight: 600; }
+  .s-filled, .s-approved { color: var(--ok); background: var(--ok-bg); }
+  .s-doubtful, .s-pending { color: var(--warn); background: var(--warn-bg); }
+  .s-missing, .s-invalid, .s-rejected { color: var(--bad); background: var(--bad-bg); }
+  .s-empty, .s-skipped { color: var(--skip); background: var(--skip-bg); }
+  tr.mismatch td { outline: 2px solid var(--bad); }
+  .grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 16px; }
+  @media (max-width: 1100px) { .grid { grid-template-columns: 1fr; } }
+  iframe { width: 100%; height: 900px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+  form.decide { display: grid; gap: 8px; margin-top: 12px; }
+  input, textarea { font: inherit; padding: 7px 9px; border: 1px solid var(--line); border-radius: 6px;
+                    background: var(--bg); color: var(--text); width: 100%; }
+  button { font: inherit; font-weight: 600; padding: 8px 14px; border-radius: 6px; border: 0; cursor: pointer; }
+  button.approve { background: var(--ok); color: #fff; }
+  button.reject { background: var(--bad); color: #fff; }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  .alert { padding: 10px 12px; border-radius: 6px; margin: 12px 0; }
+  .alert.bad { background: var(--bad-bg); color: var(--bad); }
+  .alert.warn { background: var(--warn-bg); color: var(--warn); }
+  ul.issues { margin: 0; padding-left: 16px; }
+  .kv { display: grid; grid-template-columns: max-content 1fr; gap: 2px 14px; font-size: 13px; }
+</style>
+</head>
+<body>
+<header>
+  <a href="/">form-fill-engine</a>
+  <span class="muted">Human review queue. Nothing is released without an approval.</span>
+</header>
+<main>
+{% block content %}{% endblock %}
+</main>
+</body>
+</html>

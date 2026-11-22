@@ -1,0 +1,98 @@
+# Mapping for the fictional Harborline Pension Trust self-certification (HPT-TRS-07).
+template_id: harborline_tax_residence
+title: Change of Address and Tax Residence Self-Certification
+provider: Harborline Pension Trust (fictional)
+version: "7"
+pdf: ../forms/harborline_tax_residence.pdf
+status: approved
+approved_by: compliance.reviewer@example.org
+approved_on: "2026-11-03"
+flatten: true   # released copies are flattened so fields cannot be edited after approval
+
+fields:
+  - pdf_field: member_number
+    label: Member number
+    source: contract.member_number
+    required: true
+    validate:
+      - regex: {pattern: "HPT-\\d{6}"}
+
+  - pdf_field: full_name
+    label: Full name
+    sources: [person.first_name, person.last_name]
+    transform: [join]
+    required: true
+
+  - pdf_field: birth_date
+    label: Date of birth
+    source: person.birth_date
+    required: true
+    transform: [{date: {to: "%d/%m/%Y"}}]
+
+  - pdf_field: address_street
+    label: Street
+    source: address.street
+    required: true
+
+  - pdf_field: address_postcode
+    label: Postcode
+    source: address.postcode
+    required: true
+
+  - pdf_field: address_city
+    label: City
+    source: address.city
+    required: true
+
+  - pdf_field: address_country
+    label: Country
+    source: address.country
+    required: true
+    transform:
+      - map:
+          values: {DE: Germany, BE: Belgium, NL: Netherlands, FR: France, MT: Malta}
+
+  - pdf_field: effective_date
+    label: Effective from
+    source: move.effective_date
+    required: true
+    transform: [{date: {to: "%d/%m/%Y"}}]
+    validate: [date]
+
+  - pdf_field: tax_country
+    label: Tax residence
+    source: tax.residence_country
+    required: true
+    transform:
+      - map:
+          values: {DE: Germany, BE: Belgium, NL: Netherlands, FR: France, MT: Malta}
+
+  # Only filled when the member is tax resident outside the country of the address.
+  - pdf_field: tin
+    label: Foreign TIN
+    source: tax.tin
+    when: {path: tax.foreign_residence, equals: true}
+    required: true
+
+  - pdf_field: us_person
+    label: US person
+    type: checkbox
+    source: tax.us_person
+    required: true
+
+  - pdf_field: us_tin
+    label: US taxpayer number
+    source: tax.us_tin
+    when: {path: tax.us_person, equals: true}
+    validate:
+      - regex: {pattern: "\\d{3}-\\d{2}-\\d{4}|\\d{2}-\\d{7}", message: "expected NNN-NN-NNNN or NN-NNNNNNN"}
+
+  # declaration_accepted is deliberately not mapped. A declaration is the member's own
+  # statement; software must never tick it on their behalf.
+
+rules:
+  - name: us_person_needs_us_tin
+    type: required_if
+    path: tax.us_tin
+    when: {path: tax.us_person, equals: true}
+    message: a US person must provide a US taxpayer number

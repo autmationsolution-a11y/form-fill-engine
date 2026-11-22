@@ -1,0 +1,117 @@
+# Mapping for the fictional Northwind Assurance beneficiary change form (NWA-BEN-03).
+# Each entry: PDF field name -> where the value comes from in the client record,
+# how it is transformed, how it is checked, and whether it is required.
+template_id: northwind_beneficiary_change
+title: Beneficiary Designation Change
+provider: Northwind Assurance (fictional)
+version: "3"
+pdf: ../forms/northwind_beneficiary_change.pdf
+status: approved
+approved_by: ops.lead@example.org
+approved_on: "2026-11-02"
+
+fields:
+  - pdf_field: policy_number
+    label: Policy number
+    source: contract.policy_number
+    required: true
+    validate:
+      - regex: {pattern: "NWA-\\d{8}", message: "policy numbers look like NWA-12345678"}
+
+  - pdf_field: contract_type
+    label: Contract type
+    type: radio
+    source: contract.contract_type
+    required: true
+    options: [life, savings]
+
+  # Conditional: the life cover box only exists for life contracts.
+  - pdf_field: life_cover_amount
+    label: Life cover amount
+    source: contract.life_cover_amount
+    when: {path: contract.contract_type, equals: life}
+    required: true
+    transform: [{amount: {places: 2, decimal: ",", thousands: "."}}]
+    validate:
+      - range: {min: 1000, max: 5000000}
+
+  - pdf_field: holder_name
+    label: Policyholder name
+    sources: [person.first_name, person.last_name]
+    transform: [join]
+    required: true
+
+  - pdf_field: holder_birth_date
+    label: Date of birth
+    source: person.birth_date
+    required: true
+    transform: [{date: {to: "%d/%m/%Y"}}]
+    validate:
+      - date: {not_future: true}
+
+  - pdf_field: holder_national_id
+    label: National ID
+    source: person.national_id
+    required: true
+    transform: [upper]
+    validate:
+      # Placeholder scheme: replace with the real national format agreed with compliance.
+      - national_id: {scheme: placeholder_alpha2_digits7}
+
+  - pdf_field: holder_email
+    label: E-mail
+    source: person.email
+    validate: [email]
+
+  - pdf_field: kyc_review_date
+    label: Last identity review
+    source: kyc.last_review
+    required: true
+    transform: [{date: {to: "%d/%m/%Y"}}]
+    validate:
+      # Stale identity reviews are flagged, not blocked: a reviewer decides.
+      - max_age_days: 365
+
+  - pdf_field: benef1_name
+    label: Beneficiary 1
+    source: beneficiaries[0].name
+    required: true
+
+  - pdf_field: benef1_share
+    label: Beneficiary 1 share
+    source: beneficiaries[0].share
+    required: true
+    validate:
+      - range: {min: 1, max: 100}
+
+  - pdf_field: benef2_name
+    label: Beneficiary 2
+    source: beneficiaries[1].name
+
+  - pdf_field: benef2_share
+    label: Beneficiary 2 share
+    source: beneficiaries[1].share
+    validate:
+      - range: {min: 1, max: 100}
+
+  - pdf_field: irrevocable
+    label: Irrevocable designation
+    type: checkbox
+    source: beneficiaries_irrevocable
+    default: false
+
+  - pdf_field: sign_place
+    label: Signed at
+    source: office.city
+  # sign_date is left unmapped on purpose: the policyholder dates the form when signing.
+
+rules:
+  - name: shares_total_100
+    type: sum_equals
+    paths: ["beneficiaries[0].share", "beneficiaries[1].share"]
+    total: 100
+    message: beneficiary shares must add up to 100 percent
+  - name: born_before_contract
+    type: date_order
+    before: person.birth_date
+    after: contract.start_date

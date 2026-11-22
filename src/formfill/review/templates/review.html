@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Review {{ pkg.id }}{% endblock %}
+{% block content %}
+<h1>{{ pkg.data.template_title }} <span class="badge s-{{ pkg.status }}">{{ pkg.status }}</span></h1>
+<p class="muted">{{ pkg.data.provider }}, mapping v{{ pkg.data.template_version }}. Client <code>{{ pkg.data.client_id }}</code>, package <code>{{ pkg.id }}</code>.</p>
+
+{% if mismatches %}
+<div class="alert bad">{{ mismatches }} field(s) in the PDF differ from the engine output. Do not approve; re-run the fill.</div>
+{% endif %}
+{% if pkg.report.blocking %}
+<div class="alert bad">This package has missing or invalid fields and cannot be approved. Reject it and correct the source data.</div>
+{% for issue in pkg.report.rule_issues %}
+<div class="alert {{ 'bad' if issue.severity == 'error' else 'warn' }}">Rule <code>{{ issue.code }}</code>: {{ issue.message }}</div>
+{% endfor %}
+{% elif pkg.report.summary.doubtful %}
+<div class="alert warn">{{ pkg.report.summary.doubtful }} doubtful field(s). Check each one; approving records that you accepted them.</div>
+{% endif %}
+
+<div class="grid">
+<section class="panel">
+  <table>
+    <thead><tr><th>Field</th><th>Value in PDF</th><th>Source</th><th>Source value</th><th>Status</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr class="{{ 'mismatch' if r.mismatch }}">
+        <td>{{ r.label }}<br><code class="muted">{{ r.pdf_field }}</code></td>
+        <td><strong>{{ r.in_pdf }}</strong></td>
+        <td><code>{{ r.source }}</code></td>
+        <td>{{ r.source_value }}</td>
+        <td><span class="badge s-{{ r.status }}">{{ r.status }}</span>
+          {% if r.issues %}<ul class="issues">{% for i in r.issues %}<li>{{ i.message }}</li>{% endfor %}</ul>{% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <div class="panel">
+    <div class="kv">
+      <span class="muted">Prepared by</span><span>{{ pkg.data.prepared_by }} at {{ pkg.data.created_at }}</span>
+      <span class="muted">Source</span><span>{{ pkg.data.source }}</span>
+      <span class="muted">PDF SHA-256</span><code>{{ pkg.data.pdf_sha256[:16] }}...</code>
+      <span class="muted">Flatten on release</span><span>{{ "yes" if pkg.data.flatten_on_release else "no" }}</span>
+      {% if pkg.data.decision %}
+      <span class="muted">Decision by</span><span>{{ pkg.data.decision.by }} at {{ pkg.data.decision.at }}</span>
+      {% if pkg.data.decision.reason %}<span class="muted">Reason</span><span>{{ pkg.data.decision.reason }}</span>{% endif %}
+      {% if pkg.data.decision.comment %}<span class="muted">Comment</span><span>{{ pkg.data.decision.comment }}</span>{% endif %}
+      {% if pkg.data.decision.released_sha256 %}<span class="muted">Released SHA-256</span><code>{{ pkg.data.decision.released_sha256[:16] }}...</code>{% endif %}
+      {% endif %}
+    </div>
+
+    {% if pkg.status == "pending" %}
+    <form class="decide" method="post" action="/packages/{{ pkg.id }}/approve">
+      {% if not sso %}<input name="reviewer" placeholder="Your name (reviewer)" required>{% endif %}
+      <textarea name="comment" rows="2" placeholder="Comment (optional)"></textarea>
+      <button class="approve" type="submit" {{ "disabled" if pkg.report.blocking or mismatches }}>Approve and release to outbox</button>
+    </form>
+    <form class="decide" method="post" action="/packages/{{ pkg.id }}/reject">
+      {% if not sso %}<input name="reviewer" placeholder="Your name (reviewer)" required>{% endif %}
+      <textarea name="reason" rows="2" placeholder="Reason for rejection (required)" required></textarea>
+      <button class="reject" type="submit">Reject</button>
+    </form>
+    {% endif %}
+  </div>
+  <p></p>
+  <iframe src="/packages/{{ pkg.id }}/pdf" title="Filled PDF"></iframe>
+</section>
+</div>
+{% endblock %}

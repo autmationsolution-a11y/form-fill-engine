@@ -1,0 +1,90 @@
+# Mapping for the fictional Bluepeak Wealth Partners SEPA mandate (BWP-SDD-11).
+template_id: bluepeak_sepa_mandate
+title: SEPA Direct Debit Mandate, Regular Contributions
+provider: Bluepeak Wealth Partners (fictional)
+version: "11"
+pdf: ../forms/bluepeak_sepa_mandate.pdf
+status: approved
+approved_by: ops.lead@example.org
+approved_on: "2026-11-02"
+
+fields:
+  - pdf_field: account_reference
+    label: Account reference
+    source: contract.account_reference
+    required: true
+    validate:
+      - regex: {pattern: "BWP-\\d{6}"}
+
+  - pdf_field: frequency
+    label: Frequency
+    type: radio
+    source: contract.contribution_frequency
+    required: true
+
+  - pdf_field: amount
+    label: Contribution amount
+    source: contract.contribution_amount
+    required: true
+    transform: [{amount: {places: 2}}]
+    validate:
+      # Below the provider minimum is suspicious but not impossible: flag it.
+      - range: {min: 50, severity: warning}
+
+  - pdf_field: debtor_name
+    label: Account holder
+    source: banking.holder
+    required: true
+
+  - pdf_field: debtor_street
+    label: Street
+    source: address.street
+    required: true
+
+  - pdf_field: debtor_postcode
+    label: Postcode
+    source: address.postcode
+    required: true
+
+  - pdf_field: debtor_city
+    label: City
+    source: address.city
+    required: true
+
+  - pdf_field: debtor_country
+    label: Country
+    source: address.country
+    required: true
+    validate:
+      - regex: {pattern: "[A-Z]{2}"}
+
+  - pdf_field: iban
+    label: IBAN
+    source: banking.iban
+    required: true
+    transform: [iban_spaced]
+    validate: [iban]
+
+  - pdf_field: bic
+    label: BIC
+    source: banking.bic
+    required: true
+    validate:
+      - regex: {pattern: "[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?", message: "BIC must be 8 or 11 characters"}
+
+  - pdf_field: mandate_consent
+    label: Recorded debit consent
+    type: checkbox
+    source: banking.mandate_consent
+    required: true
+    validate:
+      # The mandate is only valid with recorded consent. Unticked consent blocks release.
+      - one_of: {values: [true], message: "no recorded debit consent: obtain it before sending"}
+
+  - pdf_field: mandate_date
+    label: Mandate date
+    source: banking.mandate_date
+    required: true
+    transform: [{date: {to: "%d/%m/%Y"}}]
+    validate:
+      - date: {not_future: true}

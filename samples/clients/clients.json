@@ -1,0 +1,141 @@
+{
+  "_note": "Fictional records for demonstration only. No real person, account or identifier.",
+  "clients": [
+    {
+      "client_id": "CL-1001",
+      "person": {
+        "first_name": "Alex",
+        "last_name": "Example",
+        "birth_date": "1981-04-12",
+        "national_id": "XA1234567",
+        "email": "alex.example@example.org"
+      },
+      "address": {
+        "street": "12 Placeholder Lane",
+        "postcode": "01234",
+        "city": "Sampleton",
+        "country": "DE"
+      },
+      "contract": {
+        "policy_number": "NWA-00012345",
+        "contract_type": "life",
+        "start_date": "2019-03-01",
+        "life_cover_amount": 250000,
+        "account_reference": "BWP-104211",
+        "member_number": "HPT-778812",
+        "contribution_amount": 300,
+        "contribution_frequency": "monthly"
+      },
+      "beneficiaries": [
+        {"name": "Robin Example", "share": 60},
+        {"name": "Sam Example", "share": 40}
+      ],
+      "beneficiaries_irrevocable": false,
+      "banking": {
+        "holder": "Alex Example",
+        "iban": "DE52000000000012345678",
+        "bic": "XXXXDE00",
+        "mandate_consent": true,
+        "mandate_date": "2026-10-28"
+      },
+      "tax": {
+        "residence_country": "DE",
+        "foreign_residence": false,
+        "us_person": false
+      },
+      "kyc": {"last_review": "2026-06-15"},
+      "move": {"effective_date": "2026-12-01"},
+      "office": {"city": "Sampleton"}
+    },
+    {
+      "client_id": "CL-1002",
+      "person": {
+        "first_name": "Jordan",
+        "last_name": "Sample",
+        "birth_date": "1975-09-30",
+        "national_id": "XB7654321",
+        "email": "jordan.sample@example.org"
+      },
+      "address": {
+        "street": "4 Fiction Road",
+        "postcode": "1000",
+        "city": "Mockford",
+        "country": "BE"
+      },
+      "contract": {
+        "policy_number": "NWA-00067890",
+        "contract_type": "savings",
+        "start_date": "2021-07-15",
+        "account_reference": "BWP-209933",
+        "member_number": "HPT-112290",
+        "contribution_amount": 25,
+        "contribution_frequency": "quarterly"
+      },
+      "beneficiaries": [
+        {"name": "Taylor Sample", "share": 50},
+        {"name": "Morgan Sample", "share": 40}
+      ],
+      "beneficiaries_irrevocable": true,
+      "banking": {
+        "holder": "Jordan Sample",
+        "iban": "DE52000000000012345679",
+        "bic": "XXXXBE00",
+        "mandate_consent": true,
+        "mandate_date": "2026-10-30"
+      },
+      "tax": {
+        "residence_country": "FR",
+        "foreign_residence": true,
+        "tin": "TIN-PLACEHOLDER-0042",
+        "us_person": false
+      },
+      "kyc": {"last_review": "2026-02-01"},
+      "move": {"effective_date": "2026-11-15"},
+      "office": {"city": "Mockford"}
+    },
+    {
+      "client_id": "CL-1003",
+      "person": {
+        "first_name": "Casey",
+        "last_name": "Placeholder",
+        "birth_date": "1990-01-05",
+        "national_id": "12345"
+      },
+      "address": {
+        "street": "77 Demo Avenue",
+        "postcode": "1011",
+        "city": "Testville",
+        "country": "NL"
+      },
+      "contract": {
+        "policy_number": "NWA-00099999",
+        "contract_type": "life",
+        "start_date": "2023-05-20",
+        "life_cover_amount": 120000,
+        "account_reference": "BWP-300017",
+        "member_number": "HPT-450031",
+        "contribution_amount": 150,
+        "contribution_frequency": "monthly"
+      },
+      "beneficiaries": [
+        {"name": "Jamie Placeholder", "share": 100}
+      ],
+      "beneficiaries_irrevocable": false,
+      "banking": {
+        "holder": "Casey Placeholder",
+        "iban": "NL51ZZZZ0123456789",
+        "bic": "XXXXNL00",
+        "mandate_consent": false,
+        "mandate_date": "2026-10-29"
+      },
+      "tax": {
+        "residence_country": "NL",
+        "foreign_residence": false,
+        "us_person": true
+      },
+      "kyc": {"last_review": "2024-03-10"},
+      "move": {"effective_date": "2026-12-01"},
+      "office": {"city": "Testville"}
+    }
+  ]
+}
